@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Risk Command</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class', // Enable manual dark mode toggle
+    }
+  </script>
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+  
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    @keyframes progress {
+      0% { width: 0% }
+      100% { width: 100% }
+    }
+    .animate-progress {
+      animation: progress 45s ease-out forwards;
+    }
+    /* Mobile table scroll fix */
+    #report-content table {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+    }
+    /* Dark mode table fixes */
+    .dark #report-content table {
+      color: #e2e8f0;
+    }
+    .dark #report-content th {
+      background-color: #1e293b;
+      color: #f1f5f9;
+    }
+    .dark #report-content td {
+      border-color: #334155;
+    }
+    
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; color: black !important; }
+      .shadow-2xl { box-shadow: none !important; }
+      #report-content { padding: 0 !important; border: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 min-h-screen font-sans text-slate-800 dark:text-slate-200 transition-colors duration-300">
+
+  <button id="theme-toggle" class="fixed top-4 right-4 z-[10000] p-2 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-lg hover:scale-110 transition-transform border border-slate-200 dark:border-slate-700">
+    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+  </button>
+
+  <div id="login-screen" class="fixed inset-0 z-[9999] bg-slate-100 dark:bg-slate-950 flex flex-col items-center justify-center p-4 transition-colors duration-300">
+    <div class="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-sm text-center border border-slate-200 dark:border-slate-700">
+      <i data-lucide="lock" class="w-12 h-12 mx-auto text-slate-400 mb-4"></i>
+      <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Security Clearance</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Enter access code to proceed.</p>
+      <form id="loginForm" class="space-y-4">
+        <input type="password" id="passwordInput" placeholder="Enter Password" 
+               class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg text-center focus:ring-2 focus:ring-emerald-500 outline-none transition bg-white dark:bg-slate-700 dark:text-white dark:placeholder-slate-400">
+        <button type="submit" 
+                class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-lg transition">
+          Unlock
+        </button>
+      </form>
+      <p id="loginError" class="text-red-500 text-sm mt-4 font-medium hidden"></p>
+    </div>
+  </div>
+
+  <div id="main-app" class="hidden p-4 md:p-8">
+    
+    <div id="view-form" class="max-w-2xl mx-auto animate-fadeIn">
+      <div class="bg-white dark:bg-slate-800 rounded-xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-700 transition-colors duration-300">
+        <div class="bg-slate-900 dark:bg-black p-6 text-white">
+          <div class="flex items-center gap-3 mb-2">
+            <i data-lucide="shield" class="w-8 h-8 text-emerald-400"></i>
+            <h1 class="text-2xl font-bold">Travel Risk Command</h1>
+          </div>
+          <p class="text-slate-400">Generate expert security assessments for multi-leg journeys.</p>
+        </div>
+
+        <form id="riskForm" class="p-6 space-y-8">
+          
+          <section>
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <i data-lucide="mail" class="w-4 h-4"></i> Contact Details
+            </h3>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Recipient Email</label>
+              <input type="email" name="recipientEmail" required placeholder="security@company.com"
+                     class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white">
+            </div>
+          </section>
+
+          <section>
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <i data-lucide="calendar" class="w-4 h-4"></i> Itinerary Dates
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Start Date</label>
+                <input type="date" name="dateFrom" required
+                       class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">End Date</label>
+                <input type="date" name="dateTo" required
+                       class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white">
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="map-pin" class="w-4 h-4"></i> Destinations
+              </h3>
+              <button type="button" onclick="addLeg()"
+                      class="text-xs flex items-center gap-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full transition font-medium">
+                <i data-lucide="plus" class="w-3 h-3"></i> Add Leg
+              </button>
+            </div>
+            <div id="destinations-container" class="space-y-3"></div>
+          </section>
+
+          <section>
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <i data-lucide="plane" class="w-4 h-4"></i> Transport & Accommodation
+            </h3>
+
+            <div class="mb-6">
+              <div class="flex justify-between items-center mb-2">
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Airports</label>
+                <button type="button" onclick="addDynamicItem('airports')" class="text-xs bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400 px-2 py-1 rounded border dark:border-slate-600">
+                  + Add
+                </button>
+              </div>
+              <div id="airports-container" class="space-y-2"></div>
+            </div>
+
+            <div class="mb-6">
+              <div class="flex justify-between items-center mb-2">
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Train Stations</label>
+                <button type="button" onclick="addDynamicItem('trains')" class="text-xs bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400 px-2 py-1 rounded border dark:border-slate-600">
+                  + Add
+                </button>
+              </div>
+              <div id="trains-container" class="space-y-2"></div>
+            </div>
+
+            <div class="mb-6">
+              <div class="flex justify-between items-center mb-2">
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Bus Stations</label>
+                <button type="button" onclick="addDynamicItem('buses')" class="text-xs bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400 px-2 py-1 rounded border dark:border-slate-600">
+                  + Add
+                </button>
+              </div>
+              <div id="buses-container" class="space-y-2"></div>
+            </div>
+
+            <div class="mb-4">
+              <div class="flex justify-between items-center mb-2">
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                  <i data-lucide="hotel" class="w-4 h-4 text-slate-400"></i> Hotels
+                </label>
+                <button type="button" onclick="addDynamicItem('hotels')" class="text-xs bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400 px-2 py-1 rounded border dark:border-slate-600">
+                  + Add
+                </button>
+              </div>
+              <div id="hotels-container" class="space-y-2"></div>
+            </div>
+          </section>
+
+          <section class="border-t border-slate-200 dark:border-slate-700 pt-6">
+            <details class="group bg-slate-50 dark:bg-slate-800/50 rounded-lg transition-all duration-300">
+                <summary class="flex items-center gap-2 cursor-pointer font-bold text-slate-500 hover:text-emerald-500 dark:text-slate-400 dark:hover:text-emerald-400 uppercase tracking-wider text-sm select-none p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50">
+                    <i data-lucide="user-cog" class="w-4 h-4"></i>
+                    <span>Specific Traveler Requirements (Optional)</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                </summary>
+                
+                <div class="p-4 pt-0 space-y-4 animate-fadeIn mt-4">
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-2">
+                        Select any profiles that apply to receive specific legal and safety advice.
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition">
+                            <input type="checkbox" name="specialReq" value="LGBTQ+ Traveler" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">LGBTQ+ Traveler</span>
+                        </label>
+
+                        <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition">
+                            <input type="checkbox" name="specialReq" value="Solo Female Traveler" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Solo Female Traveler</span>
+                        </label>
+
+                        <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition">
+                            <input type="checkbox" name="specialReq" value="Mobility/Wheelchair User" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Mobility / Wheelchair User</span>
+                        </label>
+
+                        <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition">
+                            <input type="checkbox" name="specialReq" value="High Net Worth Individual (HNWI)" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">High Net Worth (HNWI)</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 mt-2">
+                            Additional Details / Medical Requirements
+                        </label>
+                        <textarea id="specialReqText" rows="2" placeholder="e.g. Requires refrigerated medication, travelling with service animal..."
+                            class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white resize-none"></textarea>
+                    </div>
+                </div>
+            </details>
+          </section>
+
+          <button type="submit" 
+                  class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center gap-2">
+            <i data-lucide="file-text" class="w-5 h-5"></i> Generate Risk Assessment
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div id="view-loading" class="hidden flex flex-col items-center justify-center min-h-[60vh] text-center p-8 animate-fadeIn">
+      <div class="relative mb-8">
+        <div class="absolute inset-0 bg-emerald-200 rounded-full blur-xl opacity-50 animate-pulse"></div>
+        <i data-lucide="loader-2" class="w-16 h-16 text-emerald-600 animate-spin relative z-10"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">Hold Tight!</h2>
+      <p class="text-slate-500 dark:text-slate-400 max-w-md">
+        Your travel report will be with you shortly.<br>
+        <span class="text-xs mt-2 block">(This usually takes 30-60 seconds)</span>
+      </p>
+      <div class="mt-8 flex flex-col gap-2 w-64">
+        <div class="h-1 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+          <div class="h-full bg-emerald-500 animate-progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-result" class="hidden max-w-4xl mx-auto animate-fadeIn">
+      <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl overflow-hidden">
+        <div class="bg-emerald-600 p-4 flex justify-between items-center text-white sticky top-0 z-50 shadow-md no-print">
+          <div class="flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-6 h-6 text-emerald-200"></i>
+            <span class="font-bold">Report Generated</span>
+          </div>
+          <div class="flex gap-3">
+             <button onclick="window.print()"
+                     class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+              <i data-lucide="printer" class="w-4 h-4"></i> Save PDF
+            </button>
+            <button onclick="resetApp()"
+                    class="bg-white text-emerald-700 hover:bg-emerald-50 px-4 py-2 rounded-lg text-sm font-medium transition">
+              New Report
+            </button>
+          </div>
+        </div>
+        
+        <div class="p-8 md:p-12 bg-slate-50 dark:bg-slate-900 min-h-screen">
+           <div id="report-content" class="prose prose-slate dark:prose-invert max-w-none bg-white dark:bg-slate-800 p-4 md:p-10 shadow-sm border border-slate-200 dark:border-slate-700 rounded-lg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- CONFIGURATION ---
+    const APP_PASSWORD = "WeAllWantToBeFree"; 
+    const WEBHOOK_URL = "https://dtts.app.n8n.cloud/webhook/eb47b7df-7354-44c2-a4fc-2499d1b37704";
+    // ---------------------
+
+    // --- DARK MODE LOGIC ---
+    const themeToggle = document.getElementById('theme-toggle');
+    
+    // Check local storage or system preference
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('color-theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('color-theme', 'dark');
+      }
+      // Refresh icons after theme change if needed
+      lucide.createIcons(); 
+    });
+
+    // --- STATE MANAGEMENT ---
+    const state = {
+      destinations: [{ id: Date.now(), city: '', country: '' }],
+      airports: [{ id: Date.now() + 1, value: '' }],
+      trains: [{ id: Date.now() + 2, value: '' }],
+      buses: [{ id: Date.now() + 3, value: '' }],
+      hotels: [{ id: Date.now() + 4, value: '' }]
+    };
+
+    // --- DOM ELEMENTS ---
+    const loginScreen = document.getElementById('login-screen');
+    const mainApp = document.getElementById('main-app');
+    const views = {
+      form: document.getElementById('view-form'),
+      loading: document.getElementById('view-loading'),
+      result: document.getElementById('view-result')
+    };
+
+    // --- INIT & LOGIN ---
+    if (sessionStorage.getItem('isLoggedIn') === 'true') showApp();
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (document.getElementById('passwordInput').value === APP_PASSWORD) {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        showApp();
+      } else {
+        document.getElementById('loginError').textContent = "Incorrect password.";
+        document.getElementById('loginError').classList.remove('hidden');
+      }
+    });
+
+    function showApp() {
+      loginScreen.style.display = 'none';
+      mainApp.style.display = 'block';
+      renderAllLists();
+      lucide.createIcons();
+    }
+
+    // --- RENDER LOGIC ---
+
+    function renderAllLists() {
+      renderDestinations();
+      renderSimpleList('airports', 'e.g. LHR, JFK', 'plane');
+      renderSimpleList('trains', 'e.g. Paddington', 'train-front'); 
+      renderSimpleList('buses', 'e.g. Victoria Coach', 'bus');
+      renderSimpleList('hotels', 'e.g. The Ritz', 'bed');
+    }
+
+    // 1. Destinations
+    function renderDestinations() {
+      const container = document.getElementById('destinations-container');
+      container.innerHTML = '';
+      state.destinations.forEach((dest) => {
+        const row = document.createElement('div');
+        row.className = 'flex gap-3 items-start animate-fadeIn';
+        row.innerHTML = `
+          <div class="flex-1">
+            <input type="text" placeholder="City (e.g. London)" required value="${dest.city}"
+                   class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
+                   onchange="updateDest(${dest.id}, 'city', this.value)">
+          </div>
+          <div class="flex-1">
+            <input type="text" placeholder="Country (e.g. UK)" required value="${dest.country}"
+                   class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
+                   onchange="updateDest(${dest.id}, 'country', this.value)">
+          </div>
+          ${state.destinations.length > 1 ? `
+            <button type="button" onclick="removeDest(${dest.id})"
+                    class="p-3 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-700 rounded-lg transition">
+              <i data-lucide="trash-2" class="w-5 h-5"></i>
+            </button>
+          ` : ''}
+        `;
+        container.appendChild(row);
+      });
+      lucide.createIcons();
+    }
+
+    // 2. Simple Lists
+    function renderSimpleList(type, placeholder, iconName) {
+      const container = document.getElementById(`${type}-container`);
+      container.innerHTML = '';
+      state[type].forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'flex gap-2 items-center animate-fadeIn';
+        row.innerHTML = `
+          <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i data-lucide="${iconName}" class="h-4 w-4 text-gray-400"></i>
+            </div>
+            <input type="text" value="${item.value}" placeholder="${placeholder}"
+                   class="w-full pl-10 p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
+                   onchange="updateSimpleItem('${type}', ${item.id}, this.value)">
+          </div>
+          ${state[type].length > 1 ? `
+            <button type="button" onclick="removeSimpleItem('${type}', ${item.id})"
+                    class="p-3 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-700 rounded-lg transition">
+              <i data-lucide="trash-2" class="w-5 h-5"></i>
+            </button>
+          ` : ''}
+        `;
+        container.appendChild(row);
+      });
+      lucide.createIcons();
+    }
+
+    // --- STATE HELPERS ---
+    window.addLeg = () => {
+      state.destinations.push({ id: Date.now(), city: '', country: '' });
+      renderDestinations();
+    };
+    window.removeDest = (id) => {
+      if (state.destinations.length > 1) {
+        state.destinations = state.destinations.filter(d => d.id !== id);
+        renderDestinations();
+      }
+    };
+    window.updateDest = (id, field, val) => {
+      const target = state.destinations.find(d => d.id === id);
+      if (target) target[field] = val;
+    };
+
+    window.addDynamicItem = (type) => {
+      state[type].push({ id: Date.now(), value: '' });
+      renderAllLists();
+    };
+    window.removeSimpleItem = (type, id) => {
+      if (state[type].length > 1) {
+        state[type] = state[type].filter(i => i.id !== id);
+        renderAllLists();
+      }
+    };
+    window.updateSimpleItem = (type, id, val) => {
+      const target = state[type].find(i => i.id === id);
+      if (target) target.value = val;
+    };
+
+    // --- SUBMIT ---
+    document.getElementById('riskForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      switchView('loading');
+
+      const formData = new FormData(e.target);
+      
+      const joinValues = (list) => list.map(i => i.value).filter(v => v.trim() !== '').join(', ');
+
+      const formatDateUK = (dateStr) => {
+        if (!dateStr) return '';
+        const [year, month, day] = dateStr.split('-');
+        return `${day}/${month}/${year}`;
+      };
+
+      const dateFromISO = formData.get('dateFrom');
+      const dateToISO = formData.get('dateTo');
+
+      // --- LOGIC FOR SPECIAL REQUIREMENTS ---
+      // 1. Get all checked boxes
+      const checkedBoxes = document.querySelectorAll('input[name="specialReq"]:checked');
+      let specialReqsList = Array.from(checkedBoxes).map(cb => cb.value);
+      
+      // 2. Get the text area
+      const specialReqText = document.getElementById('specialReqText').value.trim();
+      if (specialReqText) {
+        specialReqsList.push(specialReqText);
+      }
+      
+      // 3. Join them (e.g., "LGBTQ+ Traveler, Wheelchair User")
+      const finalSpecialReqs = specialReqsList.join(', ');
+      // ----------------------------------------
+
+      const payload = {
+        destination: state.destinations.map(d => d.city).join(', '),
+        country: state.destinations.map(d => d.country).join(', '),
+        recipientEmail: formData.get('recipientEmail'),
+        dateFrom: dateFromISO,
+        dateTo: dateToISO,
+        dates: `${formatDateUK(dateFromISO)} to ${formatDateUK(dateToISO)}`,
+        airport: joinValues(state.airports),
+        trainStation: joinValues(state.trains),
+        busStation: joinValues(state.buses),
+        hotel: joinValues(state.hotels),
+        special_requirements: finalSpecialReqs // <--- Sent to n8n
+      };
+
+      try {
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const result = await res.json();
+          const htmlContent = result.html || result.output || "<p>Report sent to email.</p>";
+          document.getElementById('report-content').innerHTML = htmlContent;
+          switchView('result');
+        } else {
+          alert("Error generating report. Please check the server.");
+          switchView('form');
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Network error.");
+        switchView('form');
+      }
+    });
+
+    function switchView(viewName) {
+      Object.values(views).forEach(el => el.classList.add('hidden'));
+      views[viewName].classList.remove('hidden');
+      window.scrollTo(0, 0);
+    }
+
+    window.resetApp = () => {
+      state.destinations = [{ id: Date.now(), city: '', country: '' }];
+      state.airports = [{ id: Date.now()+1, value: '' }];
+      state.trains = [{ id: Date.now()+2, value: '' }];
+      state.buses = [{ id: Date.now()+3, value: '' }];
+      state.hotels = [{ id: Date.now()+4, value: '' }];
+      
+      document.getElementById('riskForm').reset();
+      // Uncheck manual checkboxes that form.reset() might miss if they were modified via JS (though standard reset usually catches them)
+      document.querySelectorAll('input[name="specialReq"]').forEach(cb => cb.checked = false);
+      
+      renderAllLists();
+      switchView('form');
+    };
+  </script>
+</body>
+</html>
