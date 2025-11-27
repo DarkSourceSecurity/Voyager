@@ -109,34 +109,16 @@
           </section>
 
           <section>
-            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <i data-lucide="calendar" class="w-4 h-4"></i> Itinerary Dates
-            </h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Start Date</label>
-                <input type="date" name="dateFrom" required
-                       class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">End Date</label>
-                <input type="date" name="dateTo" required
-                       class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white">
-              </div>
-            </div>
-          </section>
-
-          <section>
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                <i data-lucide="map-pin" class="w-4 h-4"></i> Destinations
+                <i data-lucide="map-pin" class="w-4 h-4"></i> Trip Itinerary & Legs
               </h3>
               <button type="button" onclick="addLeg()"
                       class="text-xs flex items-center gap-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full transition font-medium">
                 <i data-lucide="plus" class="w-3 h-3"></i> Add Leg
               </button>
             </div>
-            <div id="destinations-container" class="space-y-3"></div>
+            <div id="destinations-container" class="space-y-4"></div>
           </section>
 
           <section>
@@ -205,17 +187,14 @@
                             <input type="checkbox" name="specialReq" value="LGBTQ+ Traveler" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
                             <span class="text-sm font-medium text-slate-700 dark:text-slate-300">LGBTQ+ Traveler</span>
                         </label>
-
                         <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition">
                             <input type="checkbox" name="specialReq" value="Solo Female Traveler" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
                             <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Solo Female Traveler</span>
                         </label>
-
                         <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition">
                             <input type="checkbox" name="specialReq" value="Mobility/Wheelchair User" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
                             <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Mobility / Wheelchair User</span>
                         </label>
-
                         <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition">
                             <input type="checkbox" name="specialReq" value="High Net Worth Individual (HNWI)" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
                             <span class="text-sm font-medium text-slate-700 dark:text-slate-300">High Net Worth (HNWI)</span>
@@ -287,7 +266,7 @@
   <script>
     // --- CONFIGURATION ---
     const APP_PASSWORD = "WeAllWantToBeFree"; 
-    const WEBHOOK_URL = "https://dtts.app.n8n.cloud/webhook/dfbfde61-956c-48ff-90ba-ed9f13ff18f1";
+    const WEBHOOK_URL = "https://dtts.app.n8n.cloud/webhook/eb47b7df-7354-44c2-a4fc-2499d1b37704";
     // ---------------------
 
     // --- DARK MODE LOGIC ---
@@ -308,13 +287,13 @@
         document.documentElement.classList.add('dark');
         localStorage.setItem('color-theme', 'dark');
       }
-      // Refresh icons after theme change if needed
       lucide.createIcons(); 
     });
 
     // --- STATE MANAGEMENT ---
+    // Updated: Destinations now hold dateFrom and dateTo
     const state = {
-      destinations: [{ id: Date.now(), city: '', country: '' }],
+      destinations: [{ id: Date.now(), city: '', country: '', dateFrom: '', dateTo: '' }],
       airports: [{ id: Date.now() + 1, value: '' }],
       trains: [{ id: Date.now() + 2, value: '' }],
       buses: [{ id: Date.now() + 3, value: '' }],
@@ -361,28 +340,52 @@
       renderSimpleList('hotels', 'e.g. The Ritz', 'bed');
     }
 
-    // 1. Destinations
+    // 1. Destinations (Updated with Date Rows)
     function renderDestinations() {
       const container = document.getElementById('destinations-container');
       container.innerHTML = '';
-      state.destinations.forEach((dest) => {
+      state.destinations.forEach((dest, index) => {
         const row = document.createElement('div');
-        row.className = 'flex gap-3 items-start animate-fadeIn';
+        row.className = 'bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 animate-fadeIn relative group';
         row.innerHTML = `
-          <div class="flex-1">
-            <input type="text" placeholder="City (e.g. London)" required value="${dest.city}"
-                   class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
-                   onchange="updateDest(${dest.id}, 'city', this.value)">
+          <div class="absolute -top-2 -left-2 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+             Leg ${index + 1}
           </div>
-          <div class="flex-1">
-            <input type="text" placeholder="Country (e.g. UK)" required value="${dest.country}"
-                   class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
-                   onchange="updateDest(${dest.id}, 'country', this.value)">
+
+          <div class="grid grid-cols-2 gap-3 mb-3 pt-2">
+            <div>
+               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">City</label>
+               <input type="text" placeholder="e.g. London" required value="${dest.city}"
+                     class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
+                     onchange="updateDest(${dest.id}, 'city', this.value)">
+            </div>
+            <div>
+               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Country</label>
+               <input type="text" placeholder="e.g. UK" required value="${dest.country}"
+                     class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
+                     onchange="updateDest(${dest.id}, 'country', this.value)">
+            </div>
           </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Arrive</label>
+               <input type="date" required value="${dest.dateFrom}"
+                     class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
+                     onchange="updateDest(${dest.id}, 'dateFrom', this.value)">
+            </div>
+            <div>
+               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Depart</label>
+               <input type="date" required value="${dest.dateTo}"
+                     class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
+                     onchange="updateDest(${dest.id}, 'dateTo', this.value)">
+            </div>
+          </div>
+
           ${state.destinations.length > 1 ? `
             <button type="button" onclick="removeDest(${dest.id})"
-                    class="p-3 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-700 rounded-lg transition">
-              <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    class="absolute top-2 right-2 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-slate-600 rounded-lg transition">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           ` : ''}
         `;
@@ -421,7 +424,8 @@
 
     // --- STATE HELPERS ---
     window.addLeg = () => {
-      state.destinations.push({ id: Date.now(), city: '', country: '' });
+      // New legs start empty
+      state.destinations.push({ id: Date.now(), city: '', country: '', dateFrom: '', dateTo: '' });
       renderDestinations();
     };
     window.removeDest = (id) => {
@@ -465,36 +469,46 @@
         return `${day}/${month}/${year}`;
       };
 
-      const dateFromISO = formData.get('dateFrom');
-      const dateToISO = formData.get('dateTo');
+      // --- NEW DATE LOGIC ---
+      // 1. Calculate overall Trip Start/End for Email Header
+      const allStartDates = state.destinations.map(d => d.dateFrom).filter(d => d).sort();
+      const allEndDates = state.destinations.map(d => d.dateTo).filter(d => d).sort();
+      
+      const overallStart = allStartDates.length > 0 ? allStartDates[0] : '';
+      const overallEnd = allEndDates.length > 0 ? allEndDates[allEndDates.length - 1] : '';
 
-      // --- LOGIC FOR SPECIAL REQUIREMENTS ---
-      // 1. Get all checked boxes
+      // 2. Create granular 'dates' string for the AI so it knows which city is when
+      // Output format: "London: 01/01/2024 - 05/01/2024; Paris: 06/01/2024 - 10/01/2024"
+      const detailedDates = state.destinations.map(d => {
+        return `${d.city}: ${formatDateUK(d.dateFrom)} - ${formatDateUK(d.dateTo)}`;
+      }).join('; ');
+      // ---------------------
+
+      // --- SPECIAL REQS LOGIC ---
       const checkedBoxes = document.querySelectorAll('input[name="specialReq"]:checked');
       let specialReqsList = Array.from(checkedBoxes).map(cb => cb.value);
-      
-      // 2. Get the text area
       const specialReqText = document.getElementById('specialReqText').value.trim();
-      if (specialReqText) {
-        specialReqsList.push(specialReqText);
-      }
-      
-      // 3. Join them (e.g., "LGBTQ+ Traveler, Wheelchair User")
+      if (specialReqText) { specialReqsList.push(specialReqText); }
       const finalSpecialReqs = specialReqsList.join(', ');
-      // ----------------------------------------
+      // --------------------------
 
       const payload = {
         destination: state.destinations.map(d => d.city).join(', '),
         country: state.destinations.map(d => d.country).join(', '),
         recipientEmail: formData.get('recipientEmail'),
-        dateFrom: dateFromISO,
-        dateTo: dateToISO,
-        dates: `${formatDateUK(dateFromISO)} to ${formatDateUK(dateToISO)}`,
+        
+        // We still send overall start/end for simplicity if needed
+        dateFrom: overallStart,
+        dateTo: overallEnd,
+        
+        // This is the key field the AI reads:
+        dates: detailedDates, 
+        
         airport: joinValues(state.airports),
         trainStation: joinValues(state.trains),
         busStation: joinValues(state.buses),
         hotel: joinValues(state.hotels),
-        special_requirements: finalSpecialReqs // <--- Sent to n8n
+        special_requirements: finalSpecialReqs
       };
 
       try {
@@ -527,14 +541,14 @@
     }
 
     window.resetApp = () => {
-      state.destinations = [{ id: Date.now(), city: '', country: '' }];
+      // Reset state to one empty leg
+      state.destinations = [{ id: Date.now(), city: '', country: '', dateFrom: '', dateTo: '' }];
       state.airports = [{ id: Date.now()+1, value: '' }];
       state.trains = [{ id: Date.now()+2, value: '' }];
       state.buses = [{ id: Date.now()+3, value: '' }];
       state.hotels = [{ id: Date.now()+4, value: '' }];
       
       document.getElementById('riskForm').reset();
-      // Uncheck manual checkboxes that form.reset() might miss if they were modified via JS (though standard reset usually catches them)
       document.querySelectorAll('input[name="specialReq"]').forEach(cb => cb.checked = false);
       
       renderAllLists();
