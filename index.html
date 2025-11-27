@@ -478,7 +478,6 @@
       const overallEnd = allEndDates.length > 0 ? allEndDates[allEndDates.length - 1] : '';
 
       // 2. Create granular 'dates' string for the AI so it knows which city is when
-      // Output format: "London: 01/01/2024 - 05/01/2024; Paris: 06/01/2024 - 10/01/2024"
       const detailedDates = state.destinations.map(d => {
         return `${d.city}: ${formatDateUK(d.dateFrom)} - ${formatDateUK(d.dateTo)}`;
       }).join('; ');
@@ -497,12 +496,15 @@
         country: state.destinations.map(d => d.country).join(', '),
         recipientEmail: formData.get('recipientEmail'),
         
-        // We still send overall start/end for simplicity if needed
         dateFrom: overallStart,
         dateTo: overallEnd,
         
         // This is the key field the AI reads:
         dates: detailedDates, 
+        
+        // --- CRITICAL: THIS IS THE ARRAY FOR THE DATABASE ---
+        itinerary_json: state.destinations,
+        // ----------------------------------------------------
         
         airport: joinValues(state.airports),
         trainStation: joinValues(state.trains),
