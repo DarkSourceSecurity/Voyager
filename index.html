@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en-GB" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,22 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class', // Enable manual dark mode toggle
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              850: '#1e293b',
+              900: '#0f172a',
+              950: '#020617', // Deepest black
+            }
+          },
+          fontFamily: {
+            sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
+          }
+        }
+      }
     }
   </script>
   
@@ -16,6 +31,29 @@
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   
   <style>
+    /* Technical Background Grid */
+    body {
+      background-color: #020617;
+      background-image: linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a; 
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155; 
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #10b981; 
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -30,91 +68,103 @@
     .animate-progress {
       animation: progress 45s ease-out forwards;
     }
-    /* Mobile table scroll fix */
-    #report-content table {
-      display: block;
-      width: 100%;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      margin-bottom: 1rem;
-      border-radius: 6px;
-    }
-    /* Dark mode table fixes */
-    .dark #report-content table {
-      color: #e2e8f0;
-    }
-    .dark #report-content th {
-      background-color: #1e293b;
-      color: #f1f5f9;
-    }
-    .dark #report-content td {
-      border-color: #334155;
-    }
     
+    /* Input Autofill Fix for Dark Mode */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    textarea:-webkit-autofill,
+    textarea:-webkit-autofill:hover,
+    textarea:-webkit-autofill:focus {
+      -webkit-text-fill-color: #e2e8f0;
+      -webkit-box-shadow: 0 0 0px 1000px #0f172a inset;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
+    /* Print Styles */
     @media print {
       .no-print { display: none !important; }
-      body { background: white !important; color: black !important; }
-      .shadow-2xl { box-shadow: none !important; }
-      #report-content { padding: 0 !important; border: none !important; }
+      body { background: white !important; color: black !important; background-image: none !important; }
+      .shadow-2xl, .shadow-lg, .shadow-glow { box-shadow: none !important; }
+      #report-content { padding: 0 !important; border: none !important; color: black !important; }
+      .border-emerald-500\/30 { border-color: #ccc !important; }
     }
   </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-950 min-h-screen font-sans text-slate-800 dark:text-slate-200 transition-colors duration-300">
+<body class="min-h-screen font-sans text-slate-300 transition-colors duration-300 selection:bg-emerald-500/30 selection:text-emerald-200">
 
-  <button id="theme-toggle" class="fixed top-4 right-4 z-[10000] p-2 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-lg hover:scale-110 transition-transform border border-slate-200 dark:border-slate-700">
+  <button id="theme-toggle" class="fixed top-4 right-4 z-[10000] p-2 rounded-full bg-slate-900 text-slate-400 hover:text-emerald-400 border border-slate-700 hover:border-emerald-500 shadow-lg transition-all">
     <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
     <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
   </button>
 
-  <div id="login-screen" class="fixed inset-0 z-[9999] bg-slate-100 dark:bg-slate-950 flex flex-col items-center justify-center p-4 transition-colors duration-300">
-    <div class="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-sm text-center border border-slate-200 dark:border-slate-700">
-      <i data-lucide="lock" class="w-12 h-12 mx-auto text-slate-400 mb-4"></i>
-      <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Security Clearance</h3>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Enter access code to proceed.</p>
+  <div id="login-screen" class="fixed inset-0 z-[9999] bg-[#020617] flex flex-col items-center justify-center p-4">
+    <div class="bg-slate-900/80 backdrop-blur-md p-8 rounded-xl w-full max-w-sm text-center border border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.1)] relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+      
+      <div class="w-16 h-16 mx-auto bg-slate-800 rounded-full flex items-center justify-center mb-6 border border-slate-700 shadow-inner">
+        <i data-lucide="lock" class="w-8 h-8 text-emerald-400"></i>
+      </div>
+      
+      <h3 class="text-xl font-bold text-white mb-2 tracking-wide uppercase">Security Clearance</h3>
+      <p class="text-sm text-slate-400 mb-8 font-mono">Authentication Required</p>
+      
       <form id="loginForm" class="space-y-4">
-        <input type="password" id="passwordInput" placeholder="Enter Password" 
-               class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg text-center focus:ring-2 focus:ring-emerald-500 outline-none transition bg-white dark:bg-slate-700 dark:text-white dark:placeholder-slate-400">
+        <div class="relative group">
+          <input type="password" id="passwordInput" placeholder="ENTER ACCESS CODE" 
+                 class="w-full p-3 bg-[#0f172a] border border-slate-700 rounded-lg text-center text-white placeholder-slate-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all font-mono tracking-widest group-hover:border-slate-500">
+        </div>
         <button type="submit" 
-                class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-lg transition">
-          Unlock
+                class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] uppercase tracking-wider text-sm">
+          Initialize System
         </button>
       </form>
-      <p id="loginError" class="text-red-500 text-sm mt-4 font-medium hidden"></p>
+      <p id="loginError" class="text-red-400 text-xs mt-4 font-mono hidden border border-red-900/50 bg-red-900/10 p-2 rounded">ACCESS DENIED</p>
     </div>
   </div>
 
   <div id="main-app" class="hidden p-4 md:p-8">
     
-    <div id="view-form" class="max-w-2xl mx-auto animate-fadeIn">
-      <div class="bg-white dark:bg-slate-800 rounded-xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-700 transition-colors duration-300">
-        <div class="bg-slate-900 dark:bg-black p-6 text-white">
-          <div class="flex items-center gap-3 mb-2">
-            <i data-lucide="shield" class="w-8 h-8 text-emerald-400"></i>
-            <h1 class="text-2xl font-bold">Voyager Travel Risk Command</h1>
+    <div id="view-form" class="max-w-3xl mx-auto animate-fadeIn">
+      <div class="bg-slate-900/90 backdrop-blur rounded-xl overflow-hidden border border-emerald-500/30 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)]">
+        
+        <div class="bg-[#020617] p-6 border-b border-emerald-900/50 relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4 opacity-10">
+            <i data-lucide="globe" class="w-32 h-32 text-emerald-500"></i>
           </div>
-          <p class="text-slate-400">Generate expert security assessments for single or multi-leg journeys.</p>
+          <div class="flex items-center gap-4 mb-2 relative z-10">
+            <div class="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+              <i data-lucide="shield" class="w-8 h-8 text-emerald-400"></i>
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold text-white tracking-tight">VOYAGER <span class="text-emerald-500">COMMAND</span></h1>
+              <p class="text-xs font-mono text-emerald-600 uppercase tracking-widest">Travel Risk Assessment Unit</p>
+            </div>
+          </div>
         </div>
 
-        <form id="riskForm" class="p-6 space-y-8">
+        <form id="riskForm" class="p-6 md:p-8 space-y-10">
           
           <section>
-            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <i data-lucide="mail" class="w-4 h-4"></i> Contact Details
+            <h3 class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <i data-lucide="mail" class="w-4 h-4"></i> Protocol Recipient
             </h3>
-            <div>
-              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Recipient Email</label>
+            <div class="relative">
               <input type="email" name="recipientEmail" required placeholder="security@company.com"
-                     class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white">
+                     class="w-full p-4 bg-[#0f172a] border border-slate-700 rounded-lg focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-white placeholder-slate-600 transition-all">
+              <div class="absolute right-4 top-4 text-slate-600 pointer-events-none">
+                <i data-lucide="at-sign" class="w-5 h-5"></i>
+              </div>
             </div>
           </section>
 
-          <section>
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                <i data-lucide="map-pin" class="w-4 h-4"></i> Trip Itinerary & Legs
+          <section class="p-4 rounded-xl border border-dashed border-slate-700 bg-slate-900/50">
+            <div class="flex justify-between items-end mb-6 border-b border-slate-800 pb-2">
+              <h3 class="text-xs font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-2">
+                <i data-lucide="map-pin" class="w-4 h-4"></i> Mission Legs
               </h3>
               <button type="button" onclick="addLeg()"
-                      class="text-xs flex items-center gap-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full transition font-medium">
+                      class="text-xs flex items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded transition font-mono uppercase">
                 <i data-lucide="plus" class="w-3 h-3"></i> Add Leg
               </button>
             </div>
@@ -122,142 +172,144 @@
           </section>
 
           <section>
-            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <i data-lucide="plane" class="w-4 h-4"></i> Transport & Accommodation
+            <h3 class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <i data-lucide="navigation" class="w-4 h-4"></i> Logistics & Assets
             </h3>
 
-            <div class="mb-6">
-              <div class="flex justify-between items-center mb-2">
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Airports</label>
-                <button type="button" onclick="addDynamicItem('airports')" class="text-xs bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400 px-2 py-1 rounded border dark:border-slate-600">
-                  + Add
-                </button>
+            <div class="grid grid-cols-1 gap-6">
+              <div class="bg-[#0f172a] p-4 rounded-lg border border-slate-800">
+                <div class="flex justify-between items-center mb-3">
+                  <label class="text-sm font-medium text-slate-300 flex items-center gap-2"><i data-lucide="plane" class="w-4 h-4 text-slate-500"></i> Airports</label>
+                  <button type="button" onclick="addDynamicItem('airports')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white px-2 py-1 rounded border border-slate-700 transition">+</button>
+                </div>
+                <div id="airports-container" class="space-y-2"></div>
               </div>
-              <div id="airports-container" class="space-y-2"></div>
-            </div>
 
-            <div class="mb-6">
-              <div class="flex justify-between items-center mb-2">
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Train Stations</label>
-                <button type="button" onclick="addDynamicItem('trains')" class="text-xs bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400 px-2 py-1 rounded border dark:border-slate-600">
-                  + Add
-                </button>
+              <div class="bg-[#0f172a] p-4 rounded-lg border border-slate-800">
+                <div class="flex justify-between items-center mb-3">
+                  <label class="text-sm font-medium text-slate-300 flex items-center gap-2"><i data-lucide="train-front" class="w-4 h-4 text-slate-500"></i> Rail</label>
+                  <button type="button" onclick="addDynamicItem('trains')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white px-2 py-1 rounded border border-slate-700 transition">+</button>
+                </div>
+                <div id="trains-container" class="space-y-2"></div>
               </div>
-              <div id="trains-container" class="space-y-2"></div>
-            </div>
 
-            <div class="mb-6">
-              <div class="flex justify-between items-center mb-2">
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Bus Stations</label>
-                <button type="button" onclick="addDynamicItem('buses')" class="text-xs bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400 px-2 py-1 rounded border dark:border-slate-600">
-                  + Add
-                </button>
+              <div class="bg-[#0f172a] p-4 rounded-lg border border-slate-800">
+                <div class="flex justify-between items-center mb-3">
+                  <label class="text-sm font-medium text-slate-300 flex items-center gap-2"><i data-lucide="bus" class="w-4 h-4 text-slate-500"></i> Ground Transport</label>
+                  <button type="button" onclick="addDynamicItem('buses')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white px-2 py-1 rounded border border-slate-700 transition">+</button>
+                </div>
+                <div id="buses-container" class="space-y-2"></div>
               </div>
-              <div id="buses-container" class="space-y-2"></div>
-            </div>
 
-            <div class="mb-4">
-              <div class="flex justify-between items-center mb-2">
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                  <i data-lucide="hotel" class="w-4 h-4 text-slate-400"></i> Hotels
-                </label>
-                <button type="button" onclick="addDynamicItem('hotels')" class="text-xs bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400 px-2 py-1 rounded border dark:border-slate-600">
-                  + Add
-                </button>
+              <div class="bg-[#0f172a] p-4 rounded-lg border border-slate-800">
+                <div class="flex justify-between items-center mb-3">
+                  <label class="text-sm font-medium text-slate-300 flex items-center gap-2"><i data-lucide="hotel" class="w-4 h-4 text-slate-500"></i> Accommodation</label>
+                  <button type="button" onclick="addDynamicItem('hotels')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white px-2 py-1 rounded border border-slate-700 transition">+</button>
+                </div>
+                <div id="hotels-container" class="space-y-2"></div>
               </div>
-              <div id="hotels-container" class="space-y-2"></div>
             </div>
           </section>
 
-          <section class="border-t border-slate-200 dark:border-slate-700 pt-6">
-            <details class="group bg-slate-50 dark:bg-slate-800/50 rounded-lg transition-all duration-300">
-                <summary class="flex items-center gap-2 cursor-pointer font-bold text-slate-500 hover:text-emerald-500 dark:text-slate-400 dark:hover:text-emerald-400 uppercase tracking-wider text-sm select-none p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50">
+          <section class="border-t border-slate-800 pt-6">
+            <details class="group bg-[#0f172a] rounded-lg border border-slate-800 transition-all duration-300 open:border-emerald-500/50 open:ring-1 open:ring-emerald-500/20">
+                <summary class="flex items-center gap-2 cursor-pointer font-bold text-slate-400 hover:text-emerald-400 uppercase tracking-widest text-xs select-none p-4 rounded-lg hover:bg-slate-800 transition">
                     <i data-lucide="user-cog" class="w-4 h-4"></i>
-                    <span>Specific Traveler Requirements (Optional)</span>
+                    <span>Profile Specifics (Optional)</span>
                     <i data-lucide="chevron-down" class="w-4 h-4 ml-auto transition-transform duration-300 group-open:rotate-180"></i>
                 </summary>
                 
-                <div class="p-4 pt-0 space-y-4 animate-fadeIn mt-4">
-                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-2">
-                        Select any profiles that apply to receive specific legal and safety advice.
+                <div class="p-4 pt-0 space-y-4 animate-fadeIn border-t border-slate-800 mt-2">
+                    <p class="text-xs text-slate-500 mb-2 font-mono mt-4">
+                        // SELECT APPLICABLE RISK PROFILES
                     </p>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition">
-                            <input type="checkbox" name="specialReq" value="LGBTQ+ Traveler" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
-                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">LGBTQ+ Traveler</span>
+                        <label class="flex items-center gap-3 p-3 border border-slate-700 rounded bg-slate-900/50 cursor-pointer hover:border-emerald-500/50 hover:bg-slate-800 transition group/check">
+                            <input type="checkbox" name="specialReq" value="LGBTQ+ Traveler" class="w-4 h-4 text-emerald-500 bg-slate-800 border-slate-600 rounded focus:ring-emerald-500 focus:ring-offset-slate-900">
+                            <span class="text-sm font-medium text-slate-300 group-hover/check:text-white">LGBTQ+ Traveler</span>
                         </label>
-                        <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition">
-                            <input type="checkbox" name="specialReq" value="Solo Female Traveler" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
-                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Solo Female Traveler</span>
+                        <label class="flex items-center gap-3 p-3 border border-slate-700 rounded bg-slate-900/50 cursor-pointer hover:border-emerald-500/50 hover:bg-slate-800 transition group/check">
+                            <input type="checkbox" name="specialReq" value="Solo Female Traveler" class="w-4 h-4 text-emerald-500 bg-slate-800 border-slate-600 rounded focus:ring-emerald-500 focus:ring-offset-slate-900">
+                            <span class="text-sm font-medium text-slate-300 group-hover/check:text-white">Solo Female Traveler</span>
                         </label>
-                        <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition">
-                            <input type="checkbox" name="specialReq" value="Mobility/Wheelchair User" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
-                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Mobility / Wheelchair User</span>
+                        <label class="flex items-center gap-3 p-3 border border-slate-700 rounded bg-slate-900/50 cursor-pointer hover:border-emerald-500/50 hover:bg-slate-800 transition group/check">
+                            <input type="checkbox" name="specialReq" value="Mobility/Wheelchair User" class="w-4 h-4 text-emerald-500 bg-slate-800 border-slate-600 rounded focus:ring-emerald-500 focus:ring-offset-slate-900">
+                            <span class="text-sm font-medium text-slate-300 group-hover/check:text-white">Mobility / Wheelchair User</span>
                         </label>
-                        <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition">
-                            <input type="checkbox" name="specialReq" value="High Net Worth Individual (HNWI)" class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500">
-                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">High Net Worth (HNWI)</span>
+                        <label class="flex items-center gap-3 p-3 border border-slate-700 rounded bg-slate-900/50 cursor-pointer hover:border-emerald-500/50 hover:bg-slate-800 transition group/check">
+                            <input type="checkbox" name="specialReq" value="High Net Worth Individual (HNWI)" class="w-4 h-4 text-emerald-500 bg-slate-800 border-slate-600 rounded focus:ring-emerald-500 focus:ring-offset-slate-900">
+                            <span class="text-sm font-medium text-slate-300 group-hover/check:text-white">High Net Worth (HNWI)</span>
                         </label>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 mt-2">
-                            Additional Details / Medical Requirements
-                        </label>
-                        <textarea id="specialReqText" rows="2" placeholder="e.g. Requires refrigerated medication, travelling with service animal..."
-                            class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white resize-none"></textarea>
+                        <label class="block text-xs font-bold text-slate-500 mb-2 mt-2 font-mono">// ADDITIONAL MEDICAL / CONTEXT</label>
+                        <textarea id="specialReqText" rows="2" placeholder="Input specific medical requirements or security context..."
+                            class="w-full p-3 bg-[#0f172a] border border-slate-700 rounded-lg focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-white placeholder-slate-600 resize-none"></textarea>
                     </div>
                 </div>
             </details>
           </section>
 
           <button type="submit" 
-                  class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center gap-2">
-            <i data-lucide="file-text" class="w-5 h-5"></i> Generate Risk Assessment
+                  class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] transform hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center gap-2 border border-emerald-400/20 group">
+            <i data-lucide="file-text" class="w-5 h-5 group-hover:scale-110 transition-transform"></i> 
+            <span class="tracking-wider">GENERATE ASSESSMENT</span>
           </button>
         </form>
+      </div>
+      <div class="text-center mt-4">
+         <p class="text-xs text-slate-600 font-mono">Voyager Command System v2.4 // Secure Connection</p>
       </div>
     </div>
 
     <div id="view-loading" class="hidden flex flex-col items-center justify-center min-h-[60vh] text-center p-8 animate-fadeIn">
       <div class="relative mb-8">
-        <div class="absolute inset-0 bg-emerald-200 rounded-full blur-xl opacity-50 animate-pulse"></div>
-        <i data-lucide="loader-2" class="w-16 h-16 text-emerald-600 animate-spin relative z-10"></i>
+        <div class="absolute inset-0 bg-emerald-500 rounded-full blur-2xl opacity-20 animate-pulse"></div>
+        <div class="relative z-10 p-4 border-2 border-emerald-500/30 rounded-full border-t-emerald-500 animate-spin">
+           <i data-lucide="radar" class="w-12 h-12 text-emerald-400"></i>
+        </div>
       </div>
-      <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">Hold Tight!</h2>
-      <p class="text-slate-500 dark:text-slate-400 max-w-md">
-        Your travel report will be with you shortly.<br>
-        <span class="text-xs mt-2 block">(This usually takes 30-60 seconds)</span>
+      <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">ANALYZING RISK FACTORS</h2>
+      <p class="text-slate-400 max-w-md font-mono text-sm">
+        Querying global intelligence databases...<br>
+        <span class="text-emerald-500/80 mt-2 block text-xs blinking-cursor">Establish secure downlink...</span>
       </p>
       <div class="mt-8 flex flex-col gap-2 w-64">
-        <div class="h-1 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-          <div class="h-full bg-emerald-500 animate-progress"></div>
+        <div class="flex justify-between text-xs text-emerald-500 font-mono mb-1">
+          <span>PROGRESS</span>
+          <span>100%</span>
+        </div>
+        <div class="h-1 w-full bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+          <div class="h-full bg-emerald-500 shadow-[0_0_10px_#10b981] animate-progress"></div>
         </div>
       </div>
     </div>
 
-    <div id="view-result" class="hidden max-w-4xl mx-auto animate-fadeIn">
-      <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl overflow-hidden">
-        <div class="bg-emerald-600 p-4 flex justify-between items-center text-white sticky top-0 z-50 shadow-md no-print">
+    <div id="view-result" class="hidden max-w-5xl mx-auto animate-fadeIn">
+      <div class="bg-slate-900 rounded-xl shadow-2xl overflow-hidden border border-slate-700">
+        <div class="bg-emerald-700 p-4 flex justify-between items-center text-white sticky top-0 z-50 shadow-lg no-print border-b border-emerald-500/30">
           <div class="flex items-center gap-2">
-            <i data-lucide="check-circle" class="w-6 h-6 text-emerald-200"></i>
-            <span class="font-bold">Report Generated</span>
+            <div class="bg-white/20 p-1 rounded-full">
+              <i data-lucide="check" class="w-4 h-4 text-white"></i>
+            </div>
+            <span class="font-bold tracking-wide text-sm uppercase">Assessment Complete</span>
           </div>
           <div class="flex gap-3">
              <button onclick="window.print()"
-                     class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
-              <i data-lucide="printer" class="w-4 h-4"></i> Save PDF
+                     class="bg-slate-900/50 hover:bg-slate-900 text-white border border-white/10 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+              <i data-lucide="printer" class="w-4 h-4"></i> <span class="hidden sm:inline">Print / PDF</span>
             </button>
             <button onclick="resetApp()"
-                    class="bg-white text-emerald-700 hover:bg-emerald-50 px-4 py-2 rounded-lg text-sm font-medium transition">
-              New Report
+                    class="bg-white text-emerald-800 hover:bg-emerald-50 px-4 py-2 rounded-lg text-sm font-bold transition shadow-lg">
+              New Mission
             </button>
           </div>
         </div>
         
-        <div class="p-8 md:p-12 bg-slate-50 dark:bg-slate-900 min-h-screen">
-           <div id="report-content" class="prose prose-slate dark:prose-invert max-w-none bg-white dark:bg-slate-800 p-4 md:p-10 shadow-sm border border-slate-200 dark:border-slate-700 rounded-lg"></div>
+        <div class="p-8 md:p-12 bg-[#0a0a0a] min-h-screen">
+           <div id="report-content" class="prose prose-invert max-w-none bg-slate-900/50 p-6 md:p-10 shadow-inner border border-slate-800 rounded-lg"></div>
         </div>
       </div>
     </div>
@@ -269,15 +321,12 @@
     const WEBHOOK_URL = "https://dtts.app.n8n.cloud/webhook/dfbfde61-956c-48ff-90ba-ed9f13ff18f1";
     // ---------------------
 
-    // --- DARK MODE LOGIC ---
+    // --- DARK MODE LOGIC (Forced Default, but toggle kept) ---
     const themeToggle = document.getElementById('theme-toggle');
     
-    // Check local storage or system preference
-    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    // Always start in dark mode for this theme
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('color-theme', 'dark');
 
     themeToggle.addEventListener('click', () => {
       if (document.documentElement.classList.contains('dark')) {
@@ -291,7 +340,6 @@
     });
 
     // --- STATE MANAGEMENT ---
-    // Updated: Destinations now hold dateFrom and dateTo
     const state = {
       destinations: [{ id: Date.now(), city: '', country: '', dateFrom: '', dateTo: '' }],
       airports: [{ id: Date.now() + 1, value: '' }],
@@ -318,7 +366,7 @@
         sessionStorage.setItem('isLoggedIn', 'true');
         showApp();
       } else {
-        document.getElementById('loginError').textContent = "Incorrect password.";
+        document.getElementById('loginError').textContent = "ACCESS DENIED // INCORRECT CODE";
         document.getElementById('loginError').classList.remove('hidden');
       }
     });
@@ -334,58 +382,59 @@
 
     function renderAllLists() {
       renderDestinations();
-      renderSimpleList('airports', 'e.g. LHR, JFK', 'plane');
-      renderSimpleList('trains', 'e.g. Paddington', 'train-front'); 
-      renderSimpleList('buses', 'e.g. Victoria Coach', 'bus');
-      renderSimpleList('hotels', 'e.g. The Ritz', 'bed');
+      renderSimpleList('airports', 'ICAO / City Code', 'plane');
+      renderSimpleList('trains', 'Station Name', 'train-front'); 
+      renderSimpleList('buses', 'Terminal / Stop', 'bus');
+      renderSimpleList('hotels', 'Hotel Name', 'bed');
     }
 
-    // 1. Destinations (Updated with Date Rows)
+    // 1. Destinations (Styled for Dark/Outline Theme)
     function renderDestinations() {
       const container = document.getElementById('destinations-container');
       container.innerHTML = '';
       state.destinations.forEach((dest, index) => {
         const row = document.createElement('div');
-        row.className = 'bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 animate-fadeIn relative group';
+        // UPDATED STYLES FOR DYNAMIC ELEMENTS
+        row.className = 'bg-[#0f172a] p-4 rounded-xl border border-slate-700 animate-fadeIn relative group hover:border-emerald-500/50 transition-colors shadow-sm mb-4';
         row.innerHTML = `
-          <div class="absolute -top-2 -left-2 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
-             Leg ${index + 1}
+          <div class="absolute -top-3 -left-1 bg-slate-800 text-emerald-400 border border-slate-600 text-[10px] font-bold px-2 py-0.5 rounded shadow-sm font-mono uppercase tracking-wider">
+              Leg 0${index + 1}
           </div>
 
-          <div class="grid grid-cols-2 gap-3 mb-3 pt-2">
+          <div class="grid grid-cols-2 gap-4 mb-3 pt-2">
             <div>
-               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">City</label>
-               <input type="text" placeholder="e.g. London" required value="${dest.city}"
-                     class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
-                     onchange="updateDest(${dest.id}, 'city', this.value)">
+               <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Target City</label>
+               <input type="text" placeholder="London" required value="${dest.city}"
+                      class="w-full p-2 bg-slate-900 border border-slate-700 rounded focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-white text-sm"
+                      onchange="updateDest(${dest.id}, 'city', this.value)">
             </div>
             <div>
-               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Country</label>
-               <input type="text" placeholder="e.g. UK" required value="${dest.country}"
-                     class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
-                     onchange="updateDest(${dest.id}, 'country', this.value)">
+               <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Country</label>
+               <input type="text" placeholder="UK" required value="${dest.country}"
+                      class="w-full p-2 bg-slate-900 border border-slate-700 rounded focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-white text-sm"
+                      onchange="updateDest(${dest.id}, 'country', this.value)">
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-2 gap-4">
             <div>
-               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Arrive</label>
+               <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Inbound</label>
                <input type="date" required value="${dest.dateFrom}"
-                     class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
-                     onchange="updateDest(${dest.id}, 'dateFrom', this.value)">
+                      class="w-full p-2 bg-slate-900 border border-slate-700 rounded focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-white text-sm"
+                      onchange="updateDest(${dest.id}, 'dateFrom', this.value)">
             </div>
             <div>
-               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Depart</label>
+               <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Outbound</label>
                <input type="date" required value="${dest.dateTo}"
-                     class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
-                     onchange="updateDest(${dest.id}, 'dateTo', this.value)">
+                      class="w-full p-2 bg-slate-900 border border-slate-700 rounded focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-white text-sm"
+                      onchange="updateDest(${dest.id}, 'dateTo', this.value)">
             </div>
           </div>
 
           ${state.destinations.length > 1 ? `
             <button type="button" onclick="removeDest(${dest.id})"
-                    class="absolute top-2 right-2 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-slate-600 rounded-lg transition">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    class="absolute top-2 right-2 p-1.5 text-slate-600 hover:text-red-400 hover:bg-red-500/10 rounded transition">
+              <i data-lucide="x" class="w-4 h-4"></i>
             </button>
           ` : ''}
         `;
@@ -394,26 +443,26 @@
       lucide.createIcons();
     }
 
-    // 2. Simple Lists
+    // 2. Simple Lists (Styled for Dark/Outline Theme)
     function renderSimpleList(type, placeholder, iconName) {
       const container = document.getElementById(`${type}-container`);
       container.innerHTML = '';
       state[type].forEach((item) => {
         const row = document.createElement('div');
-        row.className = 'flex gap-2 items-center animate-fadeIn';
+        row.className = 'flex gap-2 items-center animate-fadeIn group';
         row.innerHTML = `
           <div class="relative flex-1">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <i data-lucide="${iconName}" class="h-4 w-4 text-gray-400"></i>
+              <i data-lucide="${iconName}" class="h-3 w-3 text-slate-500 group-hover:text-emerald-500 transition-colors"></i>
             </div>
             <input type="text" value="${item.value}" placeholder="${placeholder}"
-                   class="w-full pl-10 p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 dark:text-white"
+                   class="w-full pl-9 p-2 bg-slate-900 border border-slate-700 rounded text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-white placeholder-slate-600"
                    onchange="updateSimpleItem('${type}', ${item.id}, this.value)">
           </div>
           ${state[type].length > 1 ? `
             <button type="button" onclick="removeSimpleItem('${type}', ${item.id})"
-                    class="p-3 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-700 rounded-lg transition">
-              <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    class="p-2 text-slate-600 hover:text-red-400 hover:bg-red-500/10 rounded transition">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           ` : ''}
         `;
@@ -424,7 +473,6 @@
 
     // --- STATE HELPERS ---
     window.addLeg = () => {
-      // New legs start empty
       state.destinations.push({ id: Date.now(), city: '', country: '', dateFrom: '', dateTo: '' });
       renderDestinations();
     };
@@ -469,43 +517,30 @@
         return `${day}/${month}/${year}`;
       };
 
-      // --- NEW DATE LOGIC ---
-      // 1. Calculate overall Trip Start/End for Email Header
       const allStartDates = state.destinations.map(d => d.dateFrom).filter(d => d).sort();
       const allEndDates = state.destinations.map(d => d.dateTo).filter(d => d).sort();
       
       const overallStart = allStartDates.length > 0 ? allStartDates[0] : '';
       const overallEnd = allEndDates.length > 0 ? allEndDates[allEndDates.length - 1] : '';
 
-      // 2. Create granular 'dates' string for the AI so it knows which city is when
       const detailedDates = state.destinations.map(d => {
         return `${d.city}: ${formatDateUK(d.dateFrom)} - ${formatDateUK(d.dateTo)}`;
       }).join('; ');
-      // ---------------------
 
-      // --- SPECIAL REQS LOGIC ---
       const checkedBoxes = document.querySelectorAll('input[name="specialReq"]:checked');
       let specialReqsList = Array.from(checkedBoxes).map(cb => cb.value);
       const specialReqText = document.getElementById('specialReqText').value.trim();
       if (specialReqText) { specialReqsList.push(specialReqText); }
       const finalSpecialReqs = specialReqsList.join(', ');
-      // --------------------------
 
       const payload = {
         destination: state.destinations.map(d => d.city).join(', '),
         country: state.destinations.map(d => d.country).join(', '),
         recipientEmail: formData.get('recipientEmail'),
-        
         dateFrom: overallStart,
         dateTo: overallEnd,
-        
-        // This is the key field the AI reads:
         dates: detailedDates, 
-        
-        // --- CRITICAL: THIS IS THE ARRAY FOR THE DATABASE ---
         itinerary_json: state.destinations,
-        // ----------------------------------------------------
-        
         airport: joinValues(state.airports),
         trainStation: joinValues(state.trains),
         busStation: joinValues(state.buses),
@@ -526,12 +561,12 @@
           document.getElementById('report-content').innerHTML = htmlContent;
           switchView('result');
         } else {
-          alert("Error generating report. Please check the server.");
+          alert("SYSTEM ERROR: Report generation failed.");
           switchView('form');
         }
       } catch (err) {
         console.error(err);
-        alert("Network error.");
+        alert("NETWORK ERROR: Connection lost.");
         switchView('form');
       }
     });
@@ -543,7 +578,6 @@
     }
 
     window.resetApp = () => {
-      // Reset state to one empty leg
       state.destinations = [{ id: Date.now(), city: '', country: '', dateFrom: '', dateTo: '' }];
       state.airports = [{ id: Date.now()+1, value: '' }];
       state.trains = [{ id: Date.now()+2, value: '' }];
